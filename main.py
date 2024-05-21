@@ -2,6 +2,7 @@ import yfinance as yf
 import flet as ft
 import plotly.express as px
 from flet.plotly_chart import PlotlyChart
+import unittest
 def load_favorites(file_path="favorites.txt"):
     try:
         with open(file_path, "r") as f:
@@ -69,4 +70,17 @@ def main(page: ft.Page):
     page.overlay.append(loading_animation)
     page.add(
         ft.Row([ticker_input, favorites_dropdown]),current_price_display,delta_display,get_data_button,add_to_favorites_button,chart_container,)
-ft.app(target=main)
+class TestFavorites(unittest.TestCase):
+    def test_load_favorites(self):
+        with open("favorites_test.txt", "w") as f:
+            f.write("AAPL\nMSFT\nGOOG")
+        favorites = load_favorites("favorites_test.txt")
+        self.assertEqual(favorites, ["AAPL", "MSFT", "GOOG"])
+    def test_save_favorites(self):
+        favorites = ["TSLA", "AMZN", "NVDA"]
+        save_favorites(favorites, "favorites_test.txt")
+        loaded_favorites = load_favorites("favorites_test.txt")
+        self.assertEqual(loaded_favorites, favorites)
+if __name__ == "__main__":
+    ft.app(target=main)
+    unittest.main(argv=['first-arg-is-ignored'], exit=False)
